@@ -25,7 +25,7 @@ class IPFSManager:
                 response = requests.post(f"{self.api_url}/add", files={'file': f})
                 
             if response.status_code == 200:
-                cid = response.json().get('Hash', '')
+                cid = str(response.json().get('Hash', ''))
                 logger.info(f"Successfully uploaded {filepath} to IPFS with CID: {cid}")
                 return cid
             else:

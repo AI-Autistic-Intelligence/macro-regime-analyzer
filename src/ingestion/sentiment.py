@@ -19,7 +19,7 @@ class SentimentAnalyzer:
         else:
             logger.info(f"Loading {model_name} for Sentiment Analysis...")
             # Initialize HuggingFace pipeline for sentiment analysis
-            self.nlp = pipeline("sentiment-analysis", model=model_name)
+            self.nlp = pipeline("sentiment-analysis", model=model_name)  # type: ignore
             
     def analyze_text(self, text: str) -> dict:
         """
