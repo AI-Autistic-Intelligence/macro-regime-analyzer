@@ -31,3 +31,8 @@ jobs:
     - name: Run Pytest Anti-Regression
       run: |
         pytest tests/
+
+    - name: Build Documentation (MkDocs)
+      run: |
+        pip install mkdocs-material "mkdocstrings[python]"
+        mkdocs build

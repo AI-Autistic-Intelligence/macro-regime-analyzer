@@ -17,7 +17,7 @@ class IngestionSchema(pa.DataFrameModel):
     Inflation_Rate: float = pa.Field(coerce=True, nullable=False)
     GDP_Growth: float = pa.Field(coerce=True, nullable=False)
     
-    class Config(pa.DataFrameModel.Config):
+    class Config(pa.DataFrameModel.Config):  # type: ignore
         strict = False # Allow extra columns (like index or raw metadata)
         coerce = True # Try to auto-cast types (e.g. string to float if possible)
         
