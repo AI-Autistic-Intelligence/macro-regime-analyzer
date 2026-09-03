@@ -100,3 +100,37 @@ async def explain_current_regime():
         predicted_regime=explanation["predicted_regime"],
         feature_importance=explanation["feature_importance"]
     )
+
+from src.ingestion.sentiment import SentimentAnalyzer
+from src.ingestion.onchain import OnChainAnalyzer
+
+sentiment_analyzer = SentimentAnalyzer()
+onchain_analyzer = OnChainAnalyzer()
+
+class SentimentResponse(BaseModel):
+    text: str
+    label: str
+    score: float
+
+@router.post("/sentiment/analyze", response_model=SentimentResponse)
+async def analyze_sentiment(text: str):
+    """
+    Epoch 20 & 24: Analyzes sentiment of a financial news headline.
+    """
+    result = sentiment_analyzer.analyze_text(text)
+    return SentimentResponse(
+        text=text,
+        label=result["label"],
+        score=result["score"]
+    )
+
+class OnChainResponse(BaseModel):
+    gas_price_gwei: float
+
+@router.get("/onchain/gas", response_model=OnChainResponse)
+async def get_gas_price():
+    """
+    Epoch 22 & 24: Fetches current Ethereum gas price as a macro indicator.
+    """
+    gas_price = onchain_analyzer.get_current_gas_price()
+    return OnChainResponse(gas_price_gwei=gas_price)
