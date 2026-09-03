@@ -17,7 +17,7 @@ class RedisCache(ICacheRepository):
         try:
             data = prediction.model_dump_json()
             await self.client.set("latest_regime", data)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"Redis Set Error: {e}")
             
     async def get_latest_regime(self) -> RegimePrediction | None:
@@ -26,7 +26,7 @@ class RedisCache(ICacheRepository):
             if data:
                 return RegimePrediction.model_validate_json(data)
             return None
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"Redis Get Error: {e}")
             # Fallback gracefully
             return None

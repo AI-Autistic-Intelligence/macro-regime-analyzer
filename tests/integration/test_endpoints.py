@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi.testclient import TestClient
 
@@ -20,7 +20,7 @@ class MockCacheHit(ICacheRepository):
         pass
     async def get_latest_regime(self):
         return RegimePrediction(
-            timestamp=datetime.now(),
+            timestamp=datetime.now(UTC),
             regime_id=1,
             probabilities=[0.1, 0.8, 0.1],
             model_version="v2.0.0"

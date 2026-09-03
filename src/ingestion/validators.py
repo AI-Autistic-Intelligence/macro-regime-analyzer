@@ -17,7 +17,7 @@ class IngestionSchema(pa.DataFrameModel):
     Inflation_Rate: float = pa.Field(coerce=True, nullable=False)
     GDP_Growth: float = pa.Field(coerce=True, nullable=False)
     
-    class Config:
+    class Config(pa.DataFrameModel.Config):
         strict = False # Allow extra columns (like index or raw metadata)
         coerce = True # Try to auto-cast types (e.g. string to float if possible)
         
@@ -27,5 +27,13 @@ def validate_tick(tick_dict: dict) -> pl.DataFrame:
     Raises pa.errors.SchemaError if validation fails.
     """
     df = pl.DataFrame([tick_dict])
-    validated_df = IngestionSchema.validate(df)
-    return validated_df
+    try:
+        validated_df = IngestionSchema.validate(df)
+        return validated_df
+    except pl.exceptions.ColumnNotFoundError as e:
+        raise pa.errors.SchemaError(
+            schema=IngestionSchema,
+            data=df,
+            message=f"Missing column during validation: {e!s}",
+            failure_cases=None
+        )

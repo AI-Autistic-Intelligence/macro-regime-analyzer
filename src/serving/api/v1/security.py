@@ -1,8 +1,9 @@
+import logging
+import os
+
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-import jwt
-import os
-import logging
 
 logger = logging.getLogger(__name__)
 

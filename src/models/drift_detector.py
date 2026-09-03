@@ -33,7 +33,7 @@ class ConceptDriftDetector:
             # We take the first feature column if baseline is 2D, or just a 1D vector
             base = self.baseline_data[:, 0] if len(self.baseline_data.shape) > 1 else self.baseline_data
             
-            statistic, p_value = ks_2samp(base, self.recent_data)
+            _statistic, p_value = ks_2samp(base, self.recent_data)
             self.current_p_value = float(p_value)
             
             is_drifting = p_value < self.p_value_threshold

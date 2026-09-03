@@ -29,7 +29,7 @@ DRIFT_ALERTS = Counter("macro_drift_alerts_total", "Total times Concept Drift wa
 @router.get("/regime/current", response_model=RegimePrediction)
 async def get_current_regime(
     model_type: str | None = "hmm",
-    cache: ICacheRepository = Depends(get_cache_repository)
+    cache: ICacheRepository = Depends(get_cache_repository)  # noqa: B008
 ):
     """
     Low latency endpoint to fetch the most recent regime prediction.

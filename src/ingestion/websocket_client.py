@@ -1,7 +1,8 @@
 import asyncio
-import websockets
 import json
 import logging
+
+import websockets
 from aiokafka import AIOKafkaProducer
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ async def binance_ticker_loop():
     try:
         producer = AIOKafkaProducer(bootstrap_servers='localhost:9092')
         await producer.start()
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logger.error(f"Failed to start Kafka Producer for Websocket: {e}")
         return
 
@@ -40,7 +41,7 @@ async def binance_ticker_loop():
                 await producer.send_and_wait("market_ticks", json.dumps(tick).encode('utf-8'))
                 logger.info(f"Streamed live tick: {tick['SP500_Close']}")
                 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logger.error(f"Websocket error: {e}")
     finally:
         await producer.stop()

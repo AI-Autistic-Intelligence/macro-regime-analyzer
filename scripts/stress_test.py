@@ -10,7 +10,7 @@ async def fetch(client, endpoint):
     try:
         response = await client.get(f"{API_URL}{endpoint}")
         return response.status_code
-    except Exception:
+    except Exception:  # noqa: BLE001
         return 500
 
 async def traffic_generator():

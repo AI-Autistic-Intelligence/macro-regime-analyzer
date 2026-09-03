@@ -32,5 +32,5 @@ def test_pipeline_zero_prices_handling():
         raw_calc = df.with_columns(exprs)
         # 0.0 / 100.0 = 0.0 -> log(0) = -inf
         assert raw_calc["SPY_Ret"][1] == float('-inf')
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"Pipeline crashed on zero prices: {e}")

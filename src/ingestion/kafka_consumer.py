@@ -37,7 +37,7 @@ async def start_consumer():
                 from pandera.errors import SchemaError
 
                 from src.ingestion.validators import validate_tick
-                validated_df = validate_tick(tick)
+                validate_tick(tick)
             except SchemaError as e:
                 logger.error(f"DATA CONTRACT VIOLATION! Routing to Dead Letter Queue. Error: {e!s}")
                 # TODO: Route to Dead Letter Queue (DLQ) in Kafka or Redis

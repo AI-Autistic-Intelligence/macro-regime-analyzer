@@ -1,7 +1,7 @@
 import json
 import logging
 from collections.abc import Awaitable, Callable
-from datetime import datetime
+from datetime import UTC, datetime
 
 import websockets
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -38,7 +38,7 @@ class BinanceWebSocketConnector:
                     if 'p' in data and 'q' in data:
                         tick = MarketDataTick(
                             symbol="BTCUSDT",
-                            timestamp=datetime.fromtimestamp(data['E'] / 1000.0),
+                            timestamp=datetime.fromtimestamp(data['E'] / 1000.0, tz=UTC),
                             price=float(data['p']),
                             volume=float(data['q'])
                         )

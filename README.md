@@ -1,59 +1,89 @@
-# Macro Regime Analyzer (Enterprise MLOps)
+# Macro Regime Analyzer (MRA) 📈🤖
 
-![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg)
-![Kafka](https://img.shields.io/badge/Redpanda-Streaming-black.svg)
-![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
+An **Enterprise-Grade MLOps Pipeline** built to analyze macroeconomic regimes and stream real-time financial market data. It uses Deep Learning (LSTM) for regime detection and Explainable AI (SHAP) to interpret predictions, all orchestrated within a distributed microservices architecture.
 
-An Enterprise-Grade Machine Learning Operations (MLOps) project designed to detect and predict macroeconomic regimes using both statistical models (Hidden Markov Models) and Deep Learning (Temporal Fusion Transformers / LSTM).
+## 🏗️ Architecture & Tech Stack
 
-This project demonstrates Senior-level software engineering and ML engineering principles, strictly adhering to Clean Architecture, decoupling data ingestion, feature engineering, modeling, and API serving.
+This project is built for high throughput, low latency, and robust machine learning lifecycle management.
 
-## 🚀 Key Features
+- **Ingestion**: `Redpanda` (Kafka-compatible) for event-driven streaming, `Binance Websockets` for real-time market data.
+- **Data Processing**: `Polars` for ultra-fast vectorized data transformations.
+- **Validation**: `Pandera` for Data Contracts (Schema-on-read).
+- **Feature Store**: `Feast` mock repository for online/offline feature serving.
+- **Storage**: `DuckDB` (Lakehouse) for analytical queries and `Redis` for high-speed API caching.
+- **Machine Learning**: `PyTorch` (LSTM) for temporal sequence modeling.
+- **Explainable AI (XAI)**: `SHAP` DeepExplainer for feature importance scoring.
+- **MLOps**: `MLflow` for experiment tracking and model registry.
+- **Background Tasks**: `Celery` + `RabbitMQ` for asynchronous model retraining.
+- **Serving**: `FastAPI` + `Uvicorn` for RESTful endpoints with JWT Authentication.
+- **Infrastructure**: `Docker Compose` for containerized deployment, ready for `Kubernetes`.
+- **CI/CD**: `GitHub Actions` for automated testing and linting (`Ruff` + `Pytest`).
 
-*   **Clean Architecture**: Separation of concerns (`domain`, `ingestion`, `features`, `models`, `serving`).
-*   **Event-Driven Streaming**: Real-time market tick ingestion using Redpanda (Kafka-compatible) and `aiokafka`.
-*   **A/B Model Testing**: Dynamic routing between classical unsupervised learning (HMM) and Deep Learning (PyTorch LSTM).
-*   **Ultra-Fast Data Engineering**: Pandas replaced with Rust-backed **Polars** for sub-millisecond feature generation.
-*   **Low-Latency Caching**: Predictions are cached in **Redis** to ensure `< 2ms` latency for the API.
-*   **"God Mode" Observability**: Full telemetry using **Prometheus** and **Grafana** (Hardware metrics, HTTP 4xx/5xx errors, Python GC, Latency Percentiles).
+## 🚀 Quickstart
 
-## 🏗️ Architecture Blueprint
+Ensure you have Docker and Docker Compose installed on your machine.
 
-```mermaid
-graph TD
-    A[Market Data Source] -->|Kafka Producer| B(Redpanda Broker)
-    B -->|Kafka Consumer| C[Polars Feature Pipeline]
-    C --> D{Model Router}
-    D -->|?model_type=hmm| E[HMM (scikit-learn)]
-    D -->|?model_type=lstm| F[LSTM (PyTorch)]
-    E --> G[(Redis Cache)]
-    F --> G
-    H[Client Application] -->|FastAPI REST| G
-    I[Prometheus] -->|Scrapes Metrics| H
-    J[Grafana] -->|Visualizes| I
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/AI-Autistic-Intelligence/macro-regime-analyzer.git
+   cd macro-regime-analyzer
+   ```
+
+2. **Start the Infrastructure:**
+   ```bash
+   # This spins up FastAPI, Redis, Redpanda, MLflow, Celery, Grafana, and Prometheus
+   docker-compose up -d --build
+   ```
+
+3. **Run the Real-time Ingestion:**
+   ```bash
+   # Connects to Binance and starts publishing to Redpanda
+   python src/ingestion/websocket_client.py
+   ```
+
+## 📚 Project Structure
+
+```
+.
+├── src/
+│   ├── core/         # Configs, Security (JWT), Exceptions
+│   ├── domain/       # Pydantic Entities
+│   ├── features/     # Polars pipelines and Feast Feature Store definitions
+│   ├── ingestion/    # Binance websockets, Kafka Consumer, Pandera validators
+│   ├── models/       # PyTorch LSTM, MLflow Tracker, SHAP Explainer
+│   ├── serving/      # FastAPI Server, Routers, Dependencies
+│   ├── storage/      # DuckDB Lakehouse, Redis Cache wrappers
+│   └── tasks/        # Celery background workers (Model Retraining)
+├── tests/            # Unit, Integration, and E2E (Hypothesis) tests
+├── scripts/          # Stress testing scripts
+├── k8s/              # Kubernetes manifests
+├── .github/          # CI/CD workflows
+└── docker-compose.yml
 ```
 
-## 🛠️ Quickstart (Docker)
+## 🔒 API Endpoints
 
-To launch the entire MLOps infrastructure locally:
+The API is served at `http://localhost:8000`. 
+Interactive Swagger Documentation is available at `http://localhost:8000/docs`.
+
+### Authentication
+- `POST /api/v1/auth/token` - Get JWT Access Token
+
+### Predictions
+- `GET /api/v1/predict/latest` - Get the latest macro regime prediction (Cached)
+- `POST /api/v1/predict/explain` - Get SHAP values for a specific feature array
+
+### Management
+- `POST /api/v1/models/retrain` - Trigger async Celery model retraining
+
+## ✅ Testing & Linting
+
+We enforce strict quality control. The project uses `Ruff` for lightning-fast linting and `Pytest` for anti-regression testing.
 
 ```bash
-docker compose up --build -d
+# Run Linter
+ruff check .
+
+# Run Tests
+docker-compose exec macro_analyzer python -m pytest tests/
 ```
-
-### Services Deployed:
-*   **FastAPI**: `http://localhost:8000` (Swagger UI: `http://localhost:8000/docs`)
-*   **Grafana**: `http://localhost:3030` (User: `admin`, Pass: `admin`)
-*   **Redpanda Console**: `http://localhost:8080` (Kafka UI)
-*   **Prometheus**: `http://localhost:9090`
-
-## 📊 Running the Stress Test
-
-To simulate live production traffic and trigger Prometheus alerts (High 4xx rates, CPU spikes):
-
-```bash
-python scripts/stress_test.py
-```
-View the traffic live on the pre-provisioned Grafana "Enterprise API God Mode" dashboard.

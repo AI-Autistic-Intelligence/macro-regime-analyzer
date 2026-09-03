@@ -47,10 +47,12 @@ class RegimeExplainer:
             probs = self.model(x_tensor).numpy()[0]
         predicted_class = int(np.argmax(probs))
         
-        # shap_values[predicted_class] has shape (1, seq_len, num_features)
-        # We take the values of the last time step
-        importance = shap_values[predicted_class][0, -1, :].tolist()
-        
+        # shap_values[predicted_class] has shape (1, seq_len, num_features) in older SHAP
+        # In newer SHAP, it's an array of shape (batch, seq_len, num_features, num_classes)
+        if isinstance(shap_values, list):
+            importance = shap_values[predicted_class][0, -1, :].tolist()
+        else:
+            importance = shap_values[0, -1, :, predicted_class].tolist()
         return {
             "predicted_regime": predicted_class,
             "feature_importance": {

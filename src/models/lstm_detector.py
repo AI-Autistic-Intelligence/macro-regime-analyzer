@@ -18,7 +18,7 @@ class LSTMRegimeModel(nn.Module):
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim).requires_grad_()
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim).requires_grad_()
         
-        out, (hn, cn) = self.lstm(x, (h0.detach(), c0.detach()))
+        out, (_hn, _cn) = self.lstm(x, (h0.detach(), c0.detach()))
         
         # We just want the output of the last time step
         out = self.fc(out[:, -1, :])

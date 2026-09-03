@@ -23,7 +23,7 @@ class ExperimentTracker:
         mlflow.set_experiment(experiment_name)
         logger.info(f"MLflow Tracker initialized at {self.mlflow_uri} for experiment {experiment_name}")
 
-    def log_model_metrics(self, model_type: str, metrics: dict, params: dict = None):
+    def log_model_metrics(self, model_type: str, metrics: dict, params: dict | None = None):
         """
         Logs hyperparameters and evaluation metrics for a specific model run.
         """
