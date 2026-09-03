@@ -10,12 +10,12 @@ class IngestionSchema(pa.DataFrameModel):
     Pandera Data Contract for incoming Kafka Market Ticks.
     Ensures that no corrupted data enters the machine learning pipeline.
     """
-    Date: pa.Field(coerce=True) # Expected as string or date
-    SP500_Close: pa.Field(ge=0.0, coerce=True, nullable=False)
-    VIX_Close: pa.Field(ge=0.0, coerce=True, nullable=False)
-    Interest_Rate: pa.Field(coerce=True, nullable=False)
-    Inflation_Rate: pa.Field(coerce=True, nullable=False)
-    GDP_Growth: pa.Field(coerce=True, nullable=False)
+    Date: str = pa.Field(coerce=True) # Expected as string or date
+    SP500_Close: float = pa.Field(ge=0.0, coerce=True, nullable=False)
+    VIX_Close: float = pa.Field(ge=0.0, coerce=True, nullable=False)
+    Interest_Rate: float = pa.Field(coerce=True, nullable=False)
+    Inflation_Rate: float = pa.Field(coerce=True, nullable=False)
+    GDP_Growth: float = pa.Field(coerce=True, nullable=False)
     
     class Config:
         strict = False # Allow extra columns (like index or raw metadata)
