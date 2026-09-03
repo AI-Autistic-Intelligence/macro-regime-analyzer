@@ -1,0 +1,132 @@
+version: '3.8'
+
+networks:
+  macro_net:
+    driver: bridge
+
+services:
+  # The Core API and Streamlit App
+  macro_analyzer:
+    build: .
+    container_name: macro_analyzer
+    ports:
+      - "8501:8501" # Streamlit Dashboard
+      - "8000:8000" # FastAPI
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - REDIS_URL=redis://redis_cache:6379
+      - DUCKDB_PATH=data/lakehouse.duckdb
+    depends_on:
+      - redis_cache
+    networks:
+      - macro_net
+
+  # Low-Latency Cache for API predictions
+  redis_cache:
+    image: redis:7-alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    networks:
+      - macro_net
+
+  # Observability: Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/alert.rules:/etc/prometheus/alert.rules
+    networks:
+      - macro_net
+
+  # Observability: Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - macro_net
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.10.0
+    container_name: mlflow
+    ports:
+      - "5000:5000"
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow.db
+    volumes:
+      - ./data/mlruns:/mlflow
+    working_dir: /mlflow
+    networks:
+      - macro_net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - macro_net
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    command: celery -A src.tasks.celery_app worker --loglevel=info
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - REDIS_URL=redis://redis_cache:6379/0
+    depends_on:
+      - rabbitmq
+      - redis_cache
+    networks:
+      - macro_net
+
+  # Event-Driven Streaming: Redpanda (Kafka compatible)
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:latest
+    container_name: redpanda
+    command:
+      - redpanda
+      - start
+      - --smp 1
+      - --memory 1G
+      - --reserve-memory 0M
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+      - --pandaproxy-addr 0.0.0.0:8082
+      - --advertise-pandaproxy-addr localhost:8082
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+      - "9092:9092"
+      - "29092:29092"
+    networks:
+      - macro_net
+
+  # Redpanda Console (UI)
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:latest
+    container_name: redpanda_console
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_BROKERS=redpanda:29092
+    depends_on:
+      - redpanda
+    networks:
+      - macro_net

@@ -1,0 +1,138 @@
+{
+  "title": "Enterprise API God Mode",
+  "uid": "macro-api-god-mode",
+  "tags": ["mlops", "fastapi", "production"],
+  "timezone": "browser",
+  "schemaVersion": 30,
+  "refresh": "5s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "API Requests per Second (RPS)",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[1m])) by (method, status)",
+          "legendFormat": "{{method}} - {{status}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency Percentiles (p50, p90, p99)",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p99"
+        },
+        {
+          "expr": "histogram_quantile(0.90, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p90"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p50"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "s" }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Error Rates (4xx, 5xx)",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"4..\"}[1m]))",
+          "legendFormat": "4xx Errors"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1m]))",
+          "legendFormat": "5xx Errors"
+        }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "RAM Usage (Resident)",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 300000000 },
+              { "color": "red", "value": 500000000 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "gauge",
+      "title": "CPU Usage (Cores)",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total[1m])"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Python GC Collections",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(python_gc_collections_total[1m])",
+          "legendFormat": "Gen {{generation}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Concept Drift Alert (Kolmogorov-Smirnov p-value)",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 14 },
+      "targets": [
+        {
+          "expr": "macro_drift_pvalue",
+          "legendFormat": "KS P-Value (Drift < 0.05)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 0.05 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "A/B Test Disagreements",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 14 },
+      "targets": [
+        {
+          "expr": "increase(macro_ab_test_disagreement_total[1m])",
+          "legendFormat": "HMM vs LSTM divergence"
+        }
+      ]
+    }
+  ]
+}

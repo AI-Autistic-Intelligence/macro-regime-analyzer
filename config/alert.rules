@@ -1,0 +1,56 @@
+groups:
+- name: macro_api_alerts
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "API Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute."
+
+  - alert: High5xxErrorRate
+    expr: rate(http_requests_total{status=~"5.."}[1m]) / rate(http_requests_total[1m]) > 0.05
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High HTTP 5xx error rate"
+      description: "More than 5% of requests to API are returning 5xx errors over the last minute."
+
+  - alert: High4xxErrorRate
+    expr: rate(http_requests_total{status=~"4.."}[1m]) / rate(http_requests_total[1m]) > 0.20
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High HTTP 4xx error rate"
+      description: "More than 20% of requests to API are returning 4xx errors over the last minute. Possible client abuse or bad requests."
+
+  - alert: HighLatencyP99
+    expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[1m])) by (le, handler)) > 0.5
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High p99 Latency on {{ $labels.handler }}"
+      description: "99th percentile latency for {{ $labels.handler }} is greater than 500ms."
+
+  - alert: HighMemoryUsage
+    expr: process_resident_memory_bytes > 536870912 # 512 MB
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High Memory Usage"
+      description: "API container is using more than 512MB of RAM."
+
+  - alert: FrequentRestarts
+    expr: process_start_time_seconds > (time() - 300)
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Service recently restarted"
+      description: "The API process was restarted in the last 5 minutes."

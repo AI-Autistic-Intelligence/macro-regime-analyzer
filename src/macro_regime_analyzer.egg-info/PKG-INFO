@@ -1,0 +1,100 @@
+Metadata-Version: 2.4
+Name: macro-regime-analyzer
+Version: 2.0.0
+Summary: Enterprise Macroeconomic Regime Analyzer using Clean Architecture
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pydantic>=2.4.0
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: polars>=0.19.0
+Requires-Dist: duckdb>=0.9.0
+Requires-Dist: redis>=5.0.0
+Requires-Dist: fastapi>=0.103.0
+Requires-Dist: uvicorn>=0.23.0
+Requires-Dist: hmmlearn>=0.3.0
+Requires-Dist: scikit-learn>=1.3.0
+Requires-Dist: structlog>=23.1.0
+Requires-Dist: tenacity>=8.2.0
+Requires-Dist: apscheduler>=3.10.0
+Requires-Dist: websockets>=11.0.3
+Requires-Dist: prometheus-fastapi-instrumentator>=6.1.0
+Requires-Dist: aiokafka>=0.8.0
+Requires-Dist: torch>=2.0.0
+Requires-Dist: shap>=0.44.0
+Requires-Dist: pytest>=8.0.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: pandera[polars]>=0.18.0
+Requires-Dist: ruff>=0.3.0
+Requires-Dist: mlflow>=2.10.0
+Requires-Dist: feast>=0.34.0
+Requires-Dist: celery>=5.3.6
+Requires-Dist: pika>=1.3.2
+Requires-Dist: pyjwt>=2.8.0
+Requires-Dist: passlib[bcrypt]>=1.7.4
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: hypothesis>=6.82.0; extra == "dev"
+Requires-Dist: ruff>=0.0.287; extra == "dev"
+Requires-Dist: mypy>=1.5.0; extra == "dev"
+Requires-Dist: httpx>=0.25.0; extra == "dev"
+
+# Macro Regime Analyzer (Enterprise MLOps)
+
+![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg)
+![Kafka](https://img.shields.io/badge/Redpanda-Streaming-black.svg)
+![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
+
+An Enterprise-Grade Machine Learning Operations (MLOps) project designed to detect and predict macroeconomic regimes using both statistical models (Hidden Markov Models) and Deep Learning (Temporal Fusion Transformers / LSTM).
+
+This project demonstrates Senior-level software engineering and ML engineering principles, strictly adhering to Clean Architecture, decoupling data ingestion, feature engineering, modeling, and API serving.
+
+## 🚀 Key Features
+
+*   **Clean Architecture**: Separation of concerns (`domain`, `ingestion`, `features`, `models`, `serving`).
+*   **Event-Driven Streaming**: Real-time market tick ingestion using Redpanda (Kafka-compatible) and `aiokafka`.
+*   **A/B Model Testing**: Dynamic routing between classical unsupervised learning (HMM) and Deep Learning (PyTorch LSTM).
+*   **Ultra-Fast Data Engineering**: Pandas replaced with Rust-backed **Polars** for sub-millisecond feature generation.
+*   **Low-Latency Caching**: Predictions are cached in **Redis** to ensure `< 2ms` latency for the API.
+*   **"God Mode" Observability**: Full telemetry using **Prometheus** and **Grafana** (Hardware metrics, HTTP 4xx/5xx errors, Python GC, Latency Percentiles).
+
+## 🏗️ Architecture Blueprint
+
+```mermaid
+graph TD
+    A[Market Data Source] -->|Kafka Producer| B(Redpanda Broker)
+    B -->|Kafka Consumer| C[Polars Feature Pipeline]
+    C --> D{Model Router}
+    D -->|?model_type=hmm| E[HMM (scikit-learn)]
+    D -->|?model_type=lstm| F[LSTM (PyTorch)]
+    E --> G[(Redis Cache)]
+    F --> G
+    H[Client Application] -->|FastAPI REST| G
+    I[Prometheus] -->|Scrapes Metrics| H
+    J[Grafana] -->|Visualizes| I
+```
+
+## 🛠️ Quickstart (Docker)
+
+To launch the entire MLOps infrastructure locally:
+
+```bash
+docker compose up --build -d
+```
+
+### Services Deployed:
+*   **FastAPI**: `http://localhost:8000` (Swagger UI: `http://localhost:8000/docs`)
+*   **Grafana**: `http://localhost:3030` (User: `admin`, Pass: `admin`)
+*   **Redpanda Console**: `http://localhost:8080` (Kafka UI)
+*   **Prometheus**: `http://localhost:9090`
+
+## 📊 Running the Stress Test
+
+To simulate live production traffic and trigger Prometheus alerts (High 4xx rates, CPU spikes):
+
+```bash
+python scripts/stress_test.py
+```
+View the traffic live on the pre-provisioned Grafana "Enterprise API God Mode" dashboard.

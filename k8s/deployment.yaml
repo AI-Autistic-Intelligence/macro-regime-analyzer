@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: macro-api
+  labels:
+    app: macro-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: macro-api
+  template:
+    metadata:
+      labels:
+        app: macro-api
+    spec:
+      containers:
+      - name: macro-api
+        image: macro_regime_analyzer-macro_analyzer:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: REDIS_URL
+          value: "redis://redis-master:6379/0"
+        - name: KAFKA_BROKER
+          value: "redpanda:9092"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: macro-api-service
+spec:
+  selector:
+    app: macro-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer

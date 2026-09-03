@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 15s
+
+rule_files:
+  - 'alert.rules'
+
+scrape_configs:
+  - job_name: 'macro_api'
+    static_configs:
+      - targets: ['macro_analyzer:8000']

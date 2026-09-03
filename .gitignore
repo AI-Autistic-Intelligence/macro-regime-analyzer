@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+env/
+.venv/
+.env/
+
+# Data & Databases (CRITICAL: Do not upload to GitHub!)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+*.duckdb
+*.duckdb.wal
+
+# PyTorch / ML Models
+*.pt
+*.pth
+*.onnx
+*.pkl
+models/weights/*
+!models/weights/.gitkeep
+
+# Logs and telemetry
+logs/
+*.log
+
+# Docker
+.dockerignore
+
+# IDEs
+.vscode/
+.idea/
+.ipynb_checkpoints/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment variables
+.env
+.env.local
