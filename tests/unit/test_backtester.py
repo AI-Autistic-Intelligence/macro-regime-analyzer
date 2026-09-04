@@ -1,8 +1,7 @@
 import pandas as pd
-import numpy as np
-import pytest
 
 from src.trading.backtester import RegimeBacktester
+
 
 def test_backtester_metrics():
     # Create mock daily dates

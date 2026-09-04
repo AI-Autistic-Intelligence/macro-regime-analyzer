@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
+
 from src.models.shadow_mode import ShadowModeEvaluator
+
 
 @patch("src.models.shadow_mode.mlflow")
 def test_shadow_mode_promotion(mock_mlflow):

@@ -1,5 +1,5 @@
-import pytest
 from src.trading.broker import BrokerClient
+
 
 def test_broker_execution():
     broker = BrokerClient(testnet=True)

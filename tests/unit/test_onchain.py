@@ -1,5 +1,5 @@
-import pytest
 from src.ingestion.onchain import OnChainAnalyzer
+
 
 def test_onchain_analyzer():
     analyzer = OnChainAnalyzer()

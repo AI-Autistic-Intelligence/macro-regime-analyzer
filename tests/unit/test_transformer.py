@@ -1,5 +1,7 @@
 import torch
+
 from src.models.transformer_detector import MacroTransformer
+
 
 def test_macro_transformer_output_shape():
     batch_size = 4

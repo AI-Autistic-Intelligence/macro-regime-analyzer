@@ -1,5 +1,7 @@
 import numpy as np
+
 from src.trading.portfolio import PortfolioOptimizer
+
 
 def test_portfolio_optimization():
     # 2 assets: Asset A is low risk/low reward, Asset B is high risk/high reward

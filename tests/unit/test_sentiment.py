@@ -1,5 +1,5 @@
-import pytest
 from src.ingestion.sentiment import SentimentAnalyzer
+
 
 def test_sentiment_analyzer_mock():
     # Because downloading FinBERT takes time and might fail in simple CI without cache,

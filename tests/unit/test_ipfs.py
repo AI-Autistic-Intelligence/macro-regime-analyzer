@@ -1,5 +1,5 @@
-import os
 from src.storage.ipfs import IPFSManager
+
 
 def test_ipfs_manager(tmpdir):
     manager = IPFSManager()
