@@ -1,6 +1,6 @@
 import logging
+
 import ccxt
-import time
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class BrokerClient:
                 self.current_position = 'SHORT'
                 return True
                 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"Broker execution failed: {e}")
             return False
             

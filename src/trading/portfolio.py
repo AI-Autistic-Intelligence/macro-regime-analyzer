@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize
 
+
 class PortfolioOptimizer:
     """
     Epoch 19: Portfolio Optimization & Risk Management
@@ -14,7 +15,7 @@ class PortfolioOptimizer:
     def _portfolio_variance(self, weights: np.ndarray) -> float:
         return weights.T @ self.cov_matrix @ weights
         
-    def optimize_allocation(self, target_return: float = None) -> np.ndarray:
+    def optimize_allocation(self, target_return: float | None = None) -> np.ndarray:
         """
         Finds the optimal asset weights to minimize variance (risk).
         """
