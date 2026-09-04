@@ -101,8 +101,8 @@ async def explain_current_regime():
         feature_importance=explanation["feature_importance"]
     )
 
-from src.ingestion.sentiment import SentimentAnalyzer
 from src.ingestion.onchain import OnChainAnalyzer
+from src.ingestion.sentiment import SentimentAnalyzer
 
 sentiment_analyzer = SentimentAnalyzer()
 onchain_analyzer = OnChainAnalyzer()
