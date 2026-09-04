@@ -46,3 +46,6 @@ logs/
 # Environment variables
 .env
 .env.local
+
+# MLflow
+data/mlruns/
