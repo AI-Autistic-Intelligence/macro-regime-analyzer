@@ -1,6 +1,7 @@
 import logging
-import requests
 import os
+
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ class IPFSManager:
                 logger.error(f"Failed to upload to IPFS. Status: {response.status_code}")
                 # Mock CID for tests without a real node
                 return "QmTestMockCid123456789"
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.warning(f"IPFS node unavailable: {e}. Returning mock CID.")
             return "QmTestMockCid123456789"
             
@@ -56,6 +57,6 @@ class IPFSManager:
             else:
                 logger.error(f"Failed to download from IPFS. Status: {response.status_code}")
                 return False
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"IPFS node unavailable: {e}")
             return False
