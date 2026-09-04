@@ -38,6 +38,6 @@ class OnChainAnalyzer:
             gas_price_wei = self.w3.eth.gas_price
             gas_price_gwei = float(gas_price_wei) / 10**9
             return gas_price_gwei
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"Failed to fetch gas price: {e}")
             return 0.0

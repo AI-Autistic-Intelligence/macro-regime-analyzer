@@ -1,4 +1,5 @@
 import logging
+
 try:
     from transformers import pipeline
     TRANSFORMERS_AVAILABLE = True
@@ -47,6 +48,6 @@ class SentimentAnalyzer:
                 "score": score,
                 "raw": result
             }
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"Failed to analyze text: {e}")
             return {"label": "neutral", "score": 0.0, "raw": []}
