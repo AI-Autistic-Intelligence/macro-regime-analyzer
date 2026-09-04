@@ -1,6 +1,7 @@
 import gymnasium as gym
-from gymnasium import spaces
 import numpy as np
+from gymnasium import spaces
+
 
 class MacroTradingEnv(gym.Env):
     """
@@ -9,7 +10,7 @@ class MacroTradingEnv(gym.Env):
     given macro regimes and sentiment scores.
     """
     def __init__(self, df_prices, df_regimes, df_sentiment, initial_balance=10000.0):
-        super(MacroTradingEnv, self).__init__()
+        super().__init__()
         
         self.df_prices = df_prices
         self.df_regimes = df_regimes
@@ -46,10 +47,9 @@ class MacroTradingEnv(gym.Env):
             if self.balance >= current_price:
                 self.position += 1
                 self.balance -= current_price
-        elif action == 0: # Sell
-            if self.position > 0:
-                self.position -= 1
-                self.balance += current_price
+        elif action == 0 and self.position > 0: # Sell
+            self.position -= 1
+            self.balance += current_price
                 
         self.current_step += 1
         done = self.current_step >= self.max_steps
